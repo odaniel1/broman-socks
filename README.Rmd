@@ -1,7 +1,8 @@
 ---
-title: "Broman's Socks: Exploring The Impact of Bayesian Priors pandoc_args: --webtex"
+title: "Broman's Socks: An Exact Bayesian Analysis"
 output:
   github_document:
+    pandoc_args: --webtex
     toc: true
     toc_depth: 1
 always_allow_html: yes
