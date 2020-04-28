@@ -1,0 +1,11 @@
+name: "Exact Bayesian Analysis of Karl Broman's Socks"
+navbar:
+  title: "Broman's Socks"
+  left:
+    - text: "The Likelihood"
+      href: 1_likelihood.html
+output_dir: "."
+output:
+  html_document:
+    theme: yeti
+    highlight: textmate

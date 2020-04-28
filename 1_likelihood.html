@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>The Likelihood Function</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 45px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h2 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h3 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h4 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h5 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.section h6 {
+  padding-top: 50px;
+  margin-top: -50px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Broman's Socks</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="1_likelihood.html">The Likelihood</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">The Likelihood Function</h1>
+
+</div>
+
+
+<p>Our model has two unknown parameters: <span class="math inline">\(p\)</span> the number of pairs of socks, and <span class="math inline">\(s\)</span> the number of singleton socks in the wash. There are in total <span class="math inline">\(n = 2p + s\)</span> socks.</p>
+<p>We have a single piece of <em>data</em>: that the first <span class="math inline">\(k\)</span> socks are distinct; In the case of Broman’s tweet: <span class="math inline">\(k = 11\)</span>. We denote the likelihood for parameters <span class="math inline">\(p,s\)</span> given <span class="math inline">\(k\)</span> by <span class="math inline">\(L(p,s|k)\)</span>.</p>
+<p><strong>Claim</strong> <span class="math display">\[L(p,s|k) = 
+\begin{cases}
+\binom{2p + s}{k}^{-1} \sum_{j=0}^k 2^{k-j} \binom{s}{j} \binom{p}{k-j} &amp; \text{if } k \leq p + s, \\
+0 &amp; \text{else.}
+\end{cases}
+\]</span></p>
+<p>We proceed to sketch the derivation of this formula, you can skip to the next section without any impact on the remaining text.</p>
+<p><em>Sketch Proof</em></p>
+<p>The likelihood for the sock problem can be identified as the proportion of all ways of choosing <span class="math inline">\(k\)</span> socks from <span class="math inline">\(p\)</span> pairs and <span class="math inline">\(s\)</span> singletons, for which the <span class="math inline">\(k\)</span> socks are distinct.</p>
+<p>As a starting point, note that if <span class="math inline">\(k &gt; p + s\)</span> then it is impossible for us to have <span class="math inline">\(k\)</span> different socks, so the below considers the case <span class="math inline">\(0 \leq k \leq p + s\)</span>.</p>
+<p>The denominator is the total number of ways to choose <span class="math inline">\(k\)</span> socks from a total of <span class="math inline">\(2p+s\)</span>, without replacement. This is known to be given by the binomial coefficient</p>
+<p><span class="math display">\[\binom{2p + s}{k}\]</span></p>
+<p>To calculate the numerator, the number of ways to choose <span class="math inline">\(k\)</span> distinct socks, we first condition on the number <span class="math inline">\(j\)</span> that are singletons. That is: we ask for the number of ways to choose <span class="math inline">\(j\)</span> of the <span class="math inline">\(s\)</span> singletons, and <span class="math inline">\((k-j)\)</span> distinct socks from the pairs.</p>
+<p>The first of the two is again simply the binomial coefficient <span class="math inline">\(\binom{s}{j}\)</span>; for the later we note that there are <span class="math inline">\(p\)</span> distinct <em>types</em> of socks in the pairs and we want <span class="math inline">\((k-j)\)</span> distinct types, which is <span class="math inline">\(\binom{p}{k-j}\)</span>. But since for each type there were two possible socks to choose from, we need to multiply this by <span class="math inline">\(2^{k-j}\)</span>.</p>
+<p>Combining the above, and summing over the possible values <span class="math inline">\(0 \leq j \leq k\)</span> we have</p>
+<p><span class="math display">\[ \sum_{j=0}^k 2^{k-j}\binom{s}{j}\binom{p}{k-j}.\]</span></p>
+<div id="a-sanity-check" class="section level2">
+<h2>A Sanity Check</h2>
+<p>Deriving combinatorial expressions can be particularly prone to errors, so we will want to carry out some sanity checks to ensure the formula above feels right.</p>
+<p>In the case of small values of <span class="math inline">\(k,p,s\)</span> it is possible to list all the possible combinations by hand: from which we can check the formula.</p>
+<div id="example" class="section level3">
+<h3>Example</h3>
+<p>Consider the case where <span class="math inline">\(p = 1, s = 1\)</span> for a total of <span class="math inline">\(5\)</span> socks. Let’s denote the socks <span class="math inline">\(S, P_1, P_2\)</span> where <span class="math inline">\(S\)</span> is the singleton sock and <span class="math inline">\(P_1,P_2\)</span> make a pair.</p>
+<p>Supposing <span class="math inline">\(k = 2\)</span>, the possible combinations we could observe are: <span class="math inline">\(\{S,P_1\}, \{S, P_2\}, \{P_1, P_2\}\)</span>, and of these three possibilities, in two of them we have distinct socks.</p>
+<p>Evaluating the likelihood, we note that the denominator is <span class="math inline">\(\binom{3}{2} = 3\)</span>, whilst the numerator is:</p>
+<p><span class="math display">\[ 2\binom{1}{1}\binom{1}{1} = 1,\]</span> so our formula agrees.</p>
+<p>Adding even a few extra socks quickly produces formulae which would be laborious to check by hand. Instead we can turn to a sampling approach to see whether the figures are consistent.</p>
+<p>For checking larger problems, we can (soft) validate our formula by drawing random samples and comparing the frequency of samples which satisfy the condition of all socks being distinct.</p>
+</div>
+<div id="example-1" class="section level3">
+<h3>Example</h3>
+<p>We consider the case <span class="math inline">\(p = 3, s = 4\)</span> for a total of <span class="math inline">\(n = 10\)</span> socks, and we consider <span class="math inline">\(k = 4\)</span>. This time our formula indicates that there are a total of <span class="math inline">\(\binom{10}{4} = 210\)</span> different combinations, of which the number we calculate as having <span class="math inline">\(4\)</span> distinct socks is:</p>
+<p><span class="math display">\[2^{3}\binom{4}{1}\binom{3}{3} + 2^{2}\binom{4}{2}\binom{3}{2} + 2^{1}\binom{4}{3}\binom{3}{1} + 2^{0}\binom{4}{4}\binom{3}{0} = 129\]</span> so that the probability of drawing <span class="math inline">\(4\)</span> distinct socks is <span class="math inline">\(129/210 \approx 0.61\)</span>.</p>
+<p>We now validate this calculation by sampling directly from the possible combinations:</p>
+<pre class="r"><code>library(tidyverse)
+library(knitr)
+
+p &lt;- 3
+s &lt;- 4
+k &lt;- 4
+
+W = c(rep(paste0(&quot;P&quot;,1:p), 2), paste0(&quot;S&quot;, 1:s))
+
+df &lt;- tibble(sample_id = 1:100000) %&gt;%
+mutate(
+  # each draw is a sample of k elements from W.
+  draw = pmap(., ~sample(W, k, replace = FALSE)),
+  
+  # the number of distinct elements in the draw
+  diff = map(draw, ~length(unique(.))) %&gt;% unlist
+)
+
+df %&gt;%
+summarise(
+  n = n(),
+  k_distinct = sum(diff == k),
+  prop_k_distinct = k_distinct/n
+) %&gt;%
+kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">n</th>
+<th align="right">k_distinct</th>
+<th align="right">prop_k_distinct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1e+05</td>
+<td align="right">61138</td>
+<td align="right">0.61138</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="implementing-the-likelihood" class="section level2">
+<h2>Implementing the Likelihood</h2>
+<p>Before moving to performing calculations with the likeilhood, we briefly comment on its implementation in R.</p>
+<p>For a start, it is common in calculations to work instead with the log likelihood. This is beneficial for computational reasons, where multiplication of large numbers often leads to calculations that are outside of the scale of the machine precision.</p>
+<p>Let <span class="math inline">\(l(n,m) = \log \binom{n}{m}\)</span>, then we can write the logarithm of each term in the summation as:</p>
+<p><span class="math inline">\(f(p,s|k) = (k-j) \log(2) + l(s,j) + l(p,k-j) - l(2p + s, k),\)</span></p>
+<p>from which we can retrieve the log likelihood by computing</p>
+<p><span class="math display">\[\log L(p,s|k) = \log \left( \sum_{j=0}^k \exp \bigg( f(p,s|k) \bigg) \right)\]</span> In the above we see that we still have to exponentiate the terms at some point - and this may still produce calculation issues for extreme values of <span class="math inline">\(f(p,s|k)\)</span>. To avoid this, we make use of the <a href="https://en.wikipedia.org/wiki/LogSumExp">LogSumExp</a> trick: let <span class="math inline">\(f^*\)</span> denote the largest value taken by <span class="math inline">\(f(p,s|k)\)</span> over the parameter values <span class="math inline">\(p,s\)</span></p>
+<p><span class="math inline">\(f^* = \max_{p,s} f(p,s|k),\)</span></p>
+<p>then the trick is to note the formaula above is equivalent to</p>
+<p><span class="math display">\[\log L(p,s|k) = f^* + \log \left( \sum_{j=0}^k \exp \bigg( f(p,s|k) - f^* \bigg) \right).\]</span></p>
+<p>Note that since <span class="math inline">\(f^*\)</span> is on the log scale, although it may be the largest term it will still be computationally tractable. Each term to be exponentiated is now guaranteed to be less than <span class="math inline">\(1\)</span>, and so within machine precision.</p>
+<pre class="r"><code>log_likelihood &lt;- function(p,s,k){
+  
+  if(k &gt; p + s) return(-Inf)
+  
+  f &lt;- purrr::map(0:k, function(j){
+    (k-j)*log(2) + lchoose(s,j) +lchoose(p,k-j) - lchoose(2*p + s,k)
+  })
+  
+  lL &lt;- matrixStats::logSumExp(f)
+  
+  return(lL)
+}</code></pre>
+<p>And to test that our function returns the values we expect:</p>
+<pre class="r"><code># test same values as in computational example
+lL &lt;- log_likelihood(p = 3, s=4, k = 4)
+exp(lL)</code></pre>
+<pre><code>## [1] 0.6142857</code></pre>
+</div>
+<div id="the-maximum-likelihood-estimate" class="section level1">
+<h1>The Maximum Likelihood Estimate</h1>
+<p>Whilst the purpose of this note is to consider a Bayesian analysis, first computing the Maximum Likelihood Estimate (MLE) gives us an opportunity to separate some of the initial computational aspects, from Bayesian specifics we will encounter further on.</p>
+<p>The MLE is as described - we take a point estimate that the parameters <span class="math inline">\((p,s)\)</span> that were most likely to generate the observed data <span class="math inline">\(k\)</span> are given by the values <span class="math inline">\(p,s\)</span> which maximise the (log) likelihood.</p>
+<p>Computationally we cannot enumerate all possible combinations of <span class="math inline">\(p,s\)</span>, however we can reasonably assume that they fall within a reasonable range, and then only look for the maximum of the log-likelihood on this range.</p>
+<p>Given the values <span class="math inline">\(k = 11\)</span>, we choose to search on the range <span class="math inline">\(0 \leq p,s \leq 50\)</span>, which ranges from a minimum of <span class="math inline">\(0\)</span> socks, up to a maximum of <span class="math inline">\(150\)</span> (50 pairs, and 50 singletons).</p>
+<p>We define a data frame which will enumerate all possible pairs of <span class="math inline">\(p,s\)</span> on this range; this is facilitated using the <code>crossing</code> function from <code>tidyr</code>.</p>
+<pre class="r"><code>socks &lt;- tidyr::crossing(p = 0:40, s = 0:20) %&gt;%
+  mutate(
+    n = 2*p + s,
+    k = 11
+  )</code></pre>
+<p>The log-likelihood of each pair <span class="math inline">\(p,s\)</span> can now be computed; since the function is not vectorised, we will need to use the <code>rowwise</code> function before calling <code>mutate</code>.</p>
+<pre class="r"><code>socks &lt;- socks %&gt;% 
+  dplyr::rowwise() %&gt;%
+  dplyr::mutate(
+    log_likelihood = log_likelihood(p,s,k)
+  )</code></pre>
+<p>In the below we plot how the log-likelihood, for clariftywe restrict the plot to a reduced range of parameter values</p>
+<pre class="r"><code>library(wesanderson)
+
+ggplot(socks) + 
+  geom_point( aes(2*p, s, color = log_likelihood), size = 4) +
+  scale_color_gradientn(colours = wes_palette(&quot;Zissou1&quot;, 1000, type = &quot;continuous&quot;)) +
+  coord_cartesian(xlim = c(0,60), ylim = c(0,20)) +
+  xlab(&quot;2p - Total socks that are in pairs&quot;) + ylab(&quot;s - Singleton socks&quot;) +
+  ggtitle(&quot;The Log Likelihood&quot;)</code></pre>
+<p><img src="1_likelihood_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p>To maximise the likelihood we would look to find the single point with the largest (closest to 0) log-likelihood, however the plot above indicates that such a point may not exist.</p>
+<p>In fact this is entirely to be expected: take for example any scenario in which <span class="math inline">\(p = 0\)</span>, and <span class="math inline">\(s \geq 11\)</span>,then in all these cases the probability of observing <span class="math inline">\(11\)</span> distinct socks is <span class="math inline">\(1\)</span> - meaning that we have an entire range of parameter values that are all equally likely to have generated the data.</p>
+<p>Other points to note in the graph are:</p>
+<ul>
+<li><p>For combinations which have <span class="math inline">\(n =2p + s \leq 11\)</span>, the log likelihood is <span class="math inline">\(-\infty\)</span>, which are the points showing in grey.</p></li>
+<li><p>More generally than the case of all socks being singletons, for any value <span class="math inline">\(s\)</span> the log likelihood grows as <span class="math inline">\(p\)</span> increases. This again matches expectations that the more different socks you have - the more likely you are to have drawn distinct socks.</p></li>
+</ul>
+<p>In all we see that maximum likelihood estimation will not help us to solve this particular problem! If we want to derive reasonable estimates for how many socks Karl Broman washed - we will need to bring in some knowledge (assumptions) about how people do their washing. And to do that, we will need to become Bayesians.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
