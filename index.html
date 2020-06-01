@@ -9,6 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Owen Daniel" />
 
 
 <title>Broman’s Socks: An Exact Bayesian Analysis</title>
@@ -287,6 +288,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Broman’s Socks: An Exact Bayesian Analysis</h1>
+<h4 class="author">Owen Daniel</h4>
 
 </div>
 
@@ -295,15 +297,14 @@ $(document).ready(function () {
 <blockquote>
 <p>Given that the first 11 socks that Karl Broman removed from his washing machine were all distinct, how many socks do we believe were in the washing machine to begin with?</p>
 </blockquote>
-<p>Baath’s analysis procedes using Approximate Bayesian Computation (ABC), and is an excellent introduction to this methodology. ABC is a partially Bayesian approach to moddeling, which replaces specifying the likelihood function of the model with a sampling process to approximate the likelihood.</p>
-<p>ABC is a powerful tool in settings where the likeilhood may be hard to define, or as a learning tool to lower the barrier to entry for analysts without a strong knowledge of probability. This comes at a cost of increased computational requirement, and biases introduced by sampling processes.</p>
-<p>In this analysis we demonstrate that the likelihood for this particular problem can be determined exactly, enabling a fully Bayesian analysis of Karl Broman’s washing machine.</p>
-<p>We also consider further iterations of the problem, and the sensitivity that the solution to the problem has to these assumptions. Specifically we consider:</p>
+<p>Baath uses Approximate Bayesian Computation (ABC) to answer the question, and is an excellent introduction to this methodology. ABC is a partially Bayesian approach to modelling, which replaces specifying the likelihood function of the model with a sampling process to approximate it.</p>
+<p>ABC is a powerful tool in settings where the likelihood may be hard to define, or as a learning tool to lower the barrier to entry for analysts without a background in probability or statistics. This comes at the cost of increased computational requirement, biases introduced by sampling processes, and arguably still requires the user to have the same level of mathematical understanding to ensure the sampled statistics are robust.</p>
+<p>In this analysis we demonstrate that with a willingness to perform some computation, we can derive an explicit formula for the likelihood function for Broman’s socks, enabling an exact Bayesian analysis, avoiding the need for sampling:</p>
 <ul>
-<li><p>The impact that Baath’s choice of prior has, measured against a plausible alternative.</p></li>
-<li><p>The impact of changing the model (and hence likelihood) to one that assumes that the 11th sock was a stopping time (eg. supposing that the 12th sock would break the streak).</p></li>
+<li><p>In the first section, we define the likelihood and derive an exact formula for it, before demonstrating that classical (maximum likelihood) approaches to solving the sock problem fail, neccesitating a Bayesian analysis.</p></li>
+<li><p>The second section conducts a Bayesian analysis, first using the prior distribution assumed by Baath, and we derive the posterior distribution for the number of socks. We propose an alternative form of prior distribution, and observe the impact this has on posterior estimates.</p></li>
+<li><p>In the final section we consider the quesiton of whether there is more information in Broman’s tweet than first appears: did he stop at 11 socks because the 12th would break the streak? We derive the likelihood for this <em>stopping time</em> model, and again assess the impact this has on our inference.</p></li>
 </ul>
-<p>Whilst the distributions change quite dramatically under these changes in assumptions, what is clear is that Karl Broman washes a lot of socks.</p>
 <p>Throughout we assume a basic familiarity with Bayesian methods, and in particular the notion of the likelihood and Bayes formula for combining this with prior distributions. Following the derivation of the likelihood functions will require some familiarity with combinatorics; however readers unfamiliar with this can skip the mathematical detail of the derivation.</p>
 
 
