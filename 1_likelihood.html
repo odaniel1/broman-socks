@@ -274,6 +274,9 @@ $(document).ready(function () {
         <li>
   <a href="1_likelihood.html">The Likelihood</a>
 </li>
+<li>
+  <a href="2_baath_prior.html">Baath's Prior</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -363,8 +366,8 @@ kable()</code></pre>
 <tbody>
 <tr class="odd">
 <td align="right">1e+05</td>
-<td align="right">61138</td>
-<td align="right">0.61138</td>
+<td align="right">61299</td>
+<td align="right">0.61299</td>
 </tr>
 </tbody>
 </table>
@@ -427,7 +430,7 @@ ggplot(socks) +
   coord_cartesian(xlim = c(0,60), ylim = c(0,20)) +
   xlab(&quot;2p - Total socks that are in pairs&quot;) + ylab(&quot;s - Singleton socks&quot;) +
   ggtitle(&quot;The Log Likelihood&quot;)</code></pre>
-<p><img src="1_likelihood_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p><img src="1_likelihood_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>To maximise the likelihood we would look to find the single point with the largest (closest to 0) log-likelihood, however the plot above indicates that such a point may not exist.</p>
 <p>In fact this is entirely to be expected: take for example any scenario in which <span class="math inline">\(p = 0\)</span>, and <span class="math inline">\(s \geq 11\)</span>,then in all these cases the probability of observing <span class="math inline">\(11\)</span> distinct socks is <span class="math inline">\(1\)</span> - meaning that we have an entire range of parameter values that are all equally likely to have generated the data.</p>
 <p>Other points to note in the graph are:</p>
