@@ -7,6 +7,8 @@ output:
     toc_depth: 1
 always_allow_html: yes
 ---
+```{r,echo= FALSE,message = FALSE, warning = FALSE, code = readLines(here::here("R/setup.R"))}
+```
 
 The problem of *Broman's Socks* was first analysed in a [blog post](http://www.sumsar.net/blog/2014/10/tiny-data-and-the-socks-of-karl-broman/) by Rasmus Baath, following a [tweet](https://twitter.com/kwbroman/status/523221976001679360) from Karl Broman. The problem can be stated as:
 
@@ -15,6 +17,7 @@ The problem of *Broman's Socks* was first analysed in a [blog post](http://www.s
 Baath uses Approximate Bayesian Computation (ABC) to answer the question, and is an excellent introduction to this methodology. ABC is a partially Bayesian approach to modelling, which replaces specifying the likelihood function of the model with a sampling process to approximate it.
 
 ABC is a powerful tool in settings where the likelihood may be hard to define, or as a learning tool to lower the barrier to entry for analysts without a background in probability or statistics. This comes at the cost of increased computational requirement, biases introduced by sampling processes, and arguably still requires the user to have the same level of mathematical understanding to ensure the sampled statistics are robust.
+
 
 In this analysis we demonstrate that with a willingness to perform some computation, we can derive an explicit formula for the likelihood function for Broman's socks, enabling an exact Bayesian analysis, avoiding the need for sampling:
 
@@ -25,3 +28,8 @@ In this analysis we demonstrate that with a willingness to perform some computat
 * In the final section we consider the quesiton of whether there is more information in Broman's tweet than first appears: did he stop at 11 socks because the 12th would break the streak? We derive the likelihood for this *stopping time* model, and again assess the impact this has on our inference.
 
 Following the derivation of the likelihood functions will require some familiarity with combinatorics, however readers unfamiliar with this can skip the mathematical detail of the derivation.
+
+<br>
+
+#### *Next: [Part 1: The Likelihood](1_likelihood.html)*
+
