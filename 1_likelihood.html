@@ -316,7 +316,7 @@ $(document).ready(function () {
 <p>Deriving combinatorial expressions can be particularly prone to errors, so we will want to carry out some sanity checks to ensure the formula above feels right.</p>
 <p><strong>Example</strong></p>
 <p>In the case of small values of <span class="math inline">\(k,p,s\)</span> it is possible to list all the possible combinations by hand: from which we can check the formula.</p>
-<p>Consider the case where <span class="math inline">\(p = 1, s = 1\)</span> for a total of <span class="math inline">\(3\)</span> socks. In this case the denominator in the formala above is <span class="math inline">\(\binom{3}{2} = 3\)</span>, whilst the numerator is <span class="math inline">\(2\binom{1}{1}\binom{1}{1} = 2\)</span> indicating that the likelihood of choosing two distinct socks is <span class="math inline">\(2/3\)</span>.</p>
+<p>Consider the case where <span class="math inline">\(p = 1, s = 1\)</span> for a total of <span class="math inline">\(3\)</span> socks. In this case the denominator in the formula above is <span class="math inline">\(\binom{3}{2} = 3\)</span>, whilst the numerator is <span class="math inline">\(2\binom{1}{1}\binom{1}{1} = 2\)</span> indicating that the likelihood of choosing two distinct socks is <span class="math inline">\(2/3\)</span>.</p>
 <p>To check this we can directly enumerate the possible combinations. Denoting the socks <span class="math inline">\(S, P_1, P_2\)</span> where <span class="math inline">\(S\)</span> is the singleton sock and <span class="math inline">\(P_1,P_2\)</span> make a pair, the possible combinations of two socks are: <span class="math inline">\(\{S,P_1\}, \{S, P_2\}, \{P_1, P_2\}\)</span>, as per the formula we see that two of the three possibilities result in sampling distinct socks.</p>
 <p><strong>Example</strong></p>
 <p>The example above is the smallest non-trivial example, so we also want to test our formula on a harder scenario. To test a case where it is not realistic to enumerate the possibilities by hand, we can turn to sampling.</p>
@@ -412,8 +412,8 @@ Prob. All Distinct
 <p> </p>
 <div id="implementing-the-likelihood" class="section level1">
 <h1>Implementing the Likelihood</h1>
-<p>Before moving to performing calculations with the likeilhood, we briefly comment on how to implement it computationally.</p>
-<p>As a first step, it is common in calculations tow ork with the logarithm of the likelihood (the <em>log-likelihood</em>) - this is a computational trick to avoid rounding errors which arise when working with very small probabilities.</p>
+<p>Before moving to performing calculations with the likelihood, we briefly comment on how to implement it computationally.</p>
+<p>As a first step, it is common in calculations to work with the logarithm of the likelihood (the <em>log-likelihood</em>) - this is a computational trick to avoid rounding errors which arise when working with very small probabilities.</p>
 <p>In particular, our likelihood is written in terms of binomial coefficients which themselves are defined in terms of the factorial function <span class="math inline">\(n! = 1 \times 2 \times \cdots \times n\)</span>. When working on the logarithmic scale this becomes a summation:</p>
 <p><span class="math display">\[\log n! = \sum_{j=1}^n j = \frac12 n(n+1).\]</span> Denoting the logarithm of binomial coefficient by <span class="math inline">\(l(n,m) = \log \binom{n}{m}\)</span>, we can write the logarithm of the summation term from the likelihood as:</p>
 <p><span class="math display">\[f_j = f_j(p,s|k) = (k-j)  \log(2) + l(s,j) + l(p,k-j) - l(2p + s, k),\]</span></p>
@@ -462,8 +462,8 @@ socks_likelihood_grid &lt;- function(p_max,s_max,k, prior = NULL){
 <div id="the-maximum-likelihood-estimate" class="section level1">
 <h1>The Maximum Likelihood Estimate</h1>
 <p>To motivate the need for a Bayesian analysis of the sock problem, we first consider the limitations of a maximum likelihood analysis.</p>
-<p>Recall that given the observed data (<span class="math inline">\(k\)</span> distinct socks), the maximum likelihood estimate for <span class="math inline">\((p,s)\)</span> is the pair for which the observed data was most likely to have occurred: i.e. the values that maximise <span class="math inline">\(L(p,s|k)\)</span>. Note that whilst <span class="math inline">\(L\)</span> denotes the log-likelihood, its maximum is achieved at the same point as the likelihood since it is a monotonic increasing function.</p>
-<p>Computationally we cannot enumerate all possible combinations of <span class="math inline">\(p,s\)</span>, however evaluating the log-likelihood on a range of values is sufficient to indicate the potential challanges of a MLE analysis.</p>
+<p>Recall that given the observed data (<span class="math inline">\(k\)</span> distinct socks), the maximum likelihood estimate for <span class="math inline">\((p,s)\)</span> is the pair for which the observed data was most likely to have occurred: i.e. the values that maximize <span class="math inline">\(L(p,s|k)\)</span>. Note that whilst <span class="math inline">\(L\)</span> denotes the log-likelihood, its maximum is achieved at the same point as the likelihood since it is a monotonic increasing function.</p>
+<p>Computationally we cannot enumerate all possible combinations of <span class="math inline">\(p,s\)</span>, however evaluating the log-likelihood on a range of values is sufficient to indicate the potential challenges of a MLE analysis.</p>
 <details>
 <p><summary><em>MLE Code</em></summary></p>
 <pre class="r"><code>mle &lt;- socks_likelihood_grid(p_max = 30, s_max = 20, k = 11)
@@ -477,7 +477,7 @@ mle_plot &lt;- grid_plot(mle, 2*p,s,ll) +
   )</code></pre>
 </details>
 <p><img src="1_likelihood_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>The plot indicates that the likelihood is maximised at values of <span class="math inline">\(p = 0\)</span>, for <span class="math inline">\(s \geq 11\)</span>. This should not be a surprise, since if all of the socks are distinct (so long as <span class="math inline">\(s &gt; k\)</span>) then there is a probability of <span class="math inline">\(1\)</span> that we will choose distinct socks.</p>
+<p>The plot indicates that the likelihood is maximized at values of <span class="math inline">\(p = 0\)</span>, for <span class="math inline">\(s \geq 11\)</span>. This should not be a surprise, since if all of the socks are distinct (so long as <span class="math inline">\(s &gt; k\)</span>) then there is a probability of <span class="math inline">\(1\)</span> that we will choose distinct socks.</p>
 <p>Further to this we note that away from this trivial case, the likelihood grows with the number of socks: as an example, even in the case that we considered no singleton socks, then as <span class="math inline">\(p \rightarrow \infty\)</span> the likelihood converges to <span class="math inline">\(1\)</span>. Again this is to be expected as if you have many pairs to choose, the chances that you would both socks from a pair is low.</p>
 <p>In all we see that a MLE analysis of the sock problem provides unenlightening answers: eg. implying that Karl Broman either only washed singleton socks, or that he washed infinitely many!</p>
 <p>In the next section we introduce a prior distribution over what we believe to be reasonable volumes of socks that may be in the washing machine, and show how this can be used in conjunction with the likelihood to derive results that are more in tune with our expectations.</p>
