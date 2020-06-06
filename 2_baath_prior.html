@@ -294,14 +294,13 @@ $(document).ready(function () {
 </div>
 
 
-<pre><code>## ── Attaching packages ──────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
-<pre><code>## ✓ ggplot2 3.3.0     ✓ purrr   0.3.4
-## ✓ tibble  3.0.1     ✓ dplyr   1.0.0
-## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
+<pre><code>## ── Attaching packages ───────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ tibble  3.0.1     ✓ stringr 1.4.0
 ## ✓ readr   1.3.1     ✓ forcats 0.5.0</code></pre>
-<pre><code>## ── Conflicts ─────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre><code>## ── Conflicts ──────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter()          masks stats::filter()
+## x kableExtra::group_rows() masks dplyr::group_rows()
+## x dplyr::lag()             masks stats::lag()</code></pre>
 <pre class="r"><code>socks_bayes &lt;- function(p_max = 50, s_max = 50, k = 11, log_likelihood = NULL, log_prior = NULL){
 
   if(is.null(log_prior)){
@@ -353,9 +352,9 @@ $(document).ready(function () {
 ## Please use `tibble()` instead.
 ## This warning is displayed once every 8 hours.
 ## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
-<p><img src="2_baath_prior_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<p>Having determined the total number of socks that he expects there to be in any given wash, Baath then uses a prior for the proportion of socks that are pairs, as opposed to singletons. Denoting this proportion <span class="math inline">\(\theta = 2p/(2p + s)\)</span>, Baath places on this a Beta prior (the natural choice for a proportion measure between 0 and 1). This has prior parameters <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span> which are chosen to be <span class="math inline">\(\alpha = 15, \, \beta = 2\)</span>, which were chosen to conform with his own laundry habits. We will denote this distribution by <span class="math inline">\(P_{\alpha,\beta}(\theta)\)</span>.</p>
 <p><img src="2_baath_prior_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Having determined the total number of socks that he expects there to be in any given wash, Baath then uses a prior for the proportion of socks that are pairs, as opposed to singletons. Denoting this proportion <span class="math inline">\(\theta = 2p/(2p + s)\)</span>, Baath places on this a Beta prior (the natural choice for a proportion measure between 0 and 1). This has prior parameters <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span> which are chosen to be <span class="math inline">\(\alpha = 15, \, \beta = 2\)</span>, which were chosen to conform with his own laundry habits. We will denote this distribution by <span class="math inline">\(P_{\alpha,\beta}(\theta)\)</span>.</p>
+<p><img src="2_baath_prior_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>We now have to work out how to turn priors on <span class="math inline">\(n\)</span> and <span class="math inline">\(\theta\)</span> into priors for <span class="math inline">\(p,s\)</span>; this is handled fairly easily in Baath’s original computation approach through a sampling process:</p>
 <ol style="list-style-type: decimal">
 <li>Sample <span class="math inline">\(n\)</span>, and <span class="math inline">\(\theta\)</span> from the respective prior distributions defined above.</li>
@@ -389,7 +388,7 @@ P(p,s) = P_{\mu,\sigma}(2p+s) \left\{ F_{\alpha,\beta}\left(\frac{2p +1}{2\lfloo
 }
 
 log_prior_baath &lt;- Vectorize(log_prior_baath)</code></pre>
-<p>The 2D density plot below shows how the prior distribution varies over combinations of (2p,s); the highest density goes to the scenario in which there are a total of 19 socks, made up of <span class="math inline">\(p = 8\)</span> pairs and <span class="math inline">\(s = 3\)</span> singletons. <img src="2_baath_prior_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>The 2D density plot below shows how the prior distribution varies over combinations of (2p,s); the highest density goes to the scenario in which there are a total of 19 socks, made up of <span class="math inline">\(p = 8\)</span> pairs and <span class="math inline">\(s = 3\)</span> singletons. <img src="2_baath_prior_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <pre class="r"><code>knitr::knit_exit()</code></pre>
 </div>
 </div>

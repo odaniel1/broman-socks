@@ -2,11 +2,13 @@
 title: "The Likelihood Function"
 ---
 
+```{r,echo= FALSE,message = FALSE, warning = FALSE, code = readLines(here::here("R/setup.R"))}
+```
+
 Our model has two unknown parameters: $p$ the number of pairs of socks, and $s$ the number of singleton socks in the wash. There are in total $n = 2p + s$ socks.
 
-We have a single piece of *data*: that the first $k$ socks are distinct; In the case of Broman's tweet: $k = 11$. We denote the likelihood for parameters $p,s$ given $k$ by $L(p,s|k)$.
+We have a single piece of *data*: that the first $k$ socks are distinct; In the case of Broman's tweet: $k = 11$. We denote the likelihood for parameters $p,s$ given $k$ by $L(p,s|k)$, and claim:
 
-**Claim**
 $$L(p,s|k) = 
 \begin{cases}
 \binom{2p + s}{k}^{-1} \sum_{j=0}^k 2^{k-j} \binom{s}{j} \binom{p}{k-j} & \text{if } k \leq p + s, \\
@@ -14,10 +16,8 @@ $$L(p,s|k) =
 \end{cases}
 $$
 
-We proceed to sketch the derivation of this formula, you can skip to the next section without any impact on the remaining text.
-
-*Sketch Proof*
-
+<details>
+<summary>**Sketch Proof**</summary>
 The likelihood for the sock problem can be identified as the proportion of all ways of choosing $k$ socks from $p$ pairs and $s$ singletons, for which the $k$ socks are distinct.
 
 As a starting point, note that if $k > p + s$ then it is impossible for us to have $k$ different socks, so the below considers the case $0 \leq k \leq p + s$.
@@ -33,162 +33,170 @@ The first of the two is again simply the binomial coefficient $\binom{s}{j}$; fo
 Combining the above, and summing over the possible values $0 \leq j \leq k$ we have
 
 $$ \sum_{j=0}^k 2^{k-j}\binom{s}{j}\binom{p}{k-j}.$$
+</details>
 
-## A Sanity Check
 
 Deriving combinatorial expressions can be particularly prone to errors, so we will want to carry out some sanity checks to ensure the formula above feels right.
 
+
+**Example**
+
 In the case of small values of $k,p,s$ it is possible to list all the possible combinations by hand: from which we can check the formula.
 
-### Example
-Consider the case where $p = 1, s = 1$ for a total of $5$ socks. Let's denote the socks $S, P_1, P_2$ where $S$ is the singleton sock and $P_1,P_2$ make a pair.
+Consider the case where $p = 1, s = 1$ for a total of $3$ socks. In this case the denominator in the formula above is $\binom{3}{2} = 3$, whilst the numerator is $2\binom{1}{1}\binom{1}{1} = 2$ indicating that the likelihood of choosing two distinct socks is $2/3$.
 
-Supposing $k = 2$, the possible combinations we could observe are: $\{S,P_1\}, \{S, P_2\}, \{P_1, P_2\}$, and of these three possibilities, in two of them we have distinct socks.
+To check this we can directly enumerate the possible combinations. Denoting the socks $S, P_1, P_2$ where $S$ is the singleton sock and $P_1,P_2$ make a pair, the possible combinations of two socks are: $\{S,P_1\}, \{S, P_2\}, \{P_1, P_2\}$, as per the formula we see that two of the three possibilities result in sampling distinct socks. 
 
-Evaluating the likelihood, we note that the denominator is $\binom{3}{2} = 3$, whilst the numerator is:
+**Example**
+
+The example above is the smallest non-trivial example, so we also want to test our formula on a harder scenario. To test a case where it is not realistic to enumerate the possibilities by hand, we can turn to sampling.
+
+We consider the case $p = 3, s = 4$ for a total of $n = 10$ socks, and choose $k = 4$. This time our formula indicates that there are a total of $\binom{10}{4} = 210$ different combinations, of which the number we calculate as having $4$ distinct socks is:
   
-  $$ 2\binom{1}{1}\binom{1}{1} = 1,$$
-  so our formula agrees.
+  $$2^{3}\binom{4}{1}\binom{3}{3} + 2^{2}\binom{4}{2}\binom{3}{2} + 2^{1}\binom{4}{3}\binom{3}{1} + 2^{0}\binom{4}{4}\binom{3}{0} = 129.$$
 
-Adding even a few extra socks quickly produces formulae which would be laborious to check by hand. Instead we can turn to a sampling approach to see whether the figures are consistent.
-
-For checking larger problems, we can (soft) validate our formula by drawing random samples and comparing the frequency of samples which satisfy the condition of all socks being distinct.
-
-### Example
-We consider the case $p = 3, s = 4$ for a total of $n = 10$ socks, and we consider $k = 4$. This time our formula indicates that there are a total of $\binom{10}{4} = 210$ different combinations, of which the number we calculate as having $4$ distinct socks is:
-  
-  $$2^{3}\binom{4}{1}\binom{3}{3} + 2^{2}\binom{4}{2}\binom{3}{2} + 2^{1}\binom{4}{3}\binom{3}{1} + 2^{0}\binom{4}{4}\binom{3}{0} = 129$$
-  so that the probability of drawing $4$ distinct socks is $129/210 \approx 0.61$.
+Together these imply that the probability of drawing $4$ distinct socks is $129/210 \approx 0.61$.
 
 We now validate this calculation by sampling directly from the possible combinations:
-  
-  ```{r, warning = FALSE, message = FALSE}
-library(tidyverse)
-library(knitr)
+
+<details>
+<summary>*Sampling Code*</summary>  
+```{r, warning = FALSE, message = FALSE}
+
+
+set.seed(14142)
 
 p <- 3
 s <- 4
 k <- 4
 
-W = c(rep(paste0("P",1:p), 2), paste0("S", 1:s))
+# vector of all the socks that are considered to be in the machine.
+all_socks <- c(rep(paste0("P",1:p), 2), paste0("S", 1:s))
 
-df <- tibble(sample_id = 1:100000) %>%
+# a function to sample k socks without replacement from all_socks
+sample_socks <- function(all_socks, k) sample(x = all_socks, size = k, replace = FALSE)
+
+# a function which identifies whether all the socks in a sample are distinct (return 1,
+# else returns 0)
+distinct_sample <- function(sock_sample){ 1 * (length(sock_sample) == length(unique(sock_sample)))}
+
+
+# to estimate the frequency that the socks are distinct, we will construct
+# multiple samples we refer to each as a draw (from the distribution). In total
+# we'll make 100,000 independent draws.
+draws <- tibble(
+    # number each draw
+    draw_id = 1:100000,
+) %>%
   mutate(
-    # each draw is a sample of k elements from W.
-    draw = pmap(., ~sample(W, k, replace = FALSE)),
-    
-    # the number of distinct elements in the draw
-    diff = map(draw, ~length(unique(.))) %>% unlist
+    # generate the samples
+    draw = pmap(., ~sample_socks(all_socks, k)),
+    # the number of different socks in the draw
+    all_distinct = map(draw, ~distinct_sample(.)) %>% unlist #length(unique(.))) %>% unlist
   )
 
-df %>%
-  summarise(
-    n = n(),
-    k_distinct = sum(diff == k),
-    prop_k_distinct = k_distinct/n
-  ) %>%
-  kable()
+# summary table
+summarise_draws <- tribble(
+  ~var, ~value,
+  "No. Draws", nrow(draws),
+  "No. All Distinct", sum(draws$all_distinct),
+  "Prob. All Distinct", sum(draws$all_distinct)/nrow(draws)
+) %>%
+kable(digits = 2, col.names = c("Summary", "")) %>%
+kable_styling(
+  bootstrap_options = "condensed",
+  full_width = FALSE,
+  position = "center",
+  font_size = 14
+)
+```
+</details>
+
+```{r, echo = FALSE}
+summarise_draws
 ```
 
-## Implementing the Likelihood
 
-Before moving to performing calculations with the likeilhood, we briefly comment on its implementation in R.
+&nbsp;
 
-For a start, it is common in calculations to work instead with the log likelihood. This is beneficial for computational reasons, where multiplication of large numbers often leads to calculations that are outside of the scale of the machine precision.
+# Implementing the Likelihood
 
-Let $l(n,m) = \log \binom{n}{m}$, then we can write the logarithm of each term in the summation as:
-  
-  $f(p,s|k) = (k-j)  \log(2) + l(s,j) + l(p,k-j) - l(2p + s, k),$
-  
-  from which we can retrieve the log likelihood by computing
+Before moving to performing calculations with the likelihood, we briefly comment on how to implement it computationally.
 
-$$\log L(p,s|k) = \log \left( \sum_{j=0}^k \exp \bigg( f(p,s|k) \bigg) \right)$$
-  In the above we see that we still have to exponentiate the terms at some point - and this may still produce calculation issues for extreme values of $f(p,s|k)$. To avoid this, we make use of the [LogSumExp](https://en.wikipedia.org/wiki/LogSumExp) trick: let $f^*$ denote the largest value taken by $f(p,s|k)$ over the parameter values $p,s$
-  
-  $f^* = \max_{p,s} f(p,s|k),$
-  
-  then the trick is to note the formaula above is equivalent to
+As a first step, it is common in calculations to work with the logarithm of the likelihood (the *log-likelihood*) - this is a computational trick to avoid rounding errors which arise when working with very small probabilities.
 
-$$\log L(p,s|k) = f^* + \log \left( \sum_{j=0}^k \exp \bigg( f(p,s|k) - f^* \bigg) \right).$$
-  
-  Note that since $f^*$ is on the log scale, although it may be the largest term it will still be computationally tractable. Each term to be exponentiated is now guaranteed to be less than $1$, and so within machine precision.
+In particular, our likelihood is written in terms of binomial coefficients which themselves are defined in terms of the factorial function $n! = 1 \times 2 \times \cdots \times n$. When working on the logarithmic scale this becomes a summation:
 
-```{r}
-log_likelihood <- function(p,s,k){
+$$\log n! = \sum_{j=1}^n j = \frac12 n(n+1).$$
+Denoting the logarithm of binomial coefficient by $l(n,m) = \log \binom{n}{m}$, we can write the logarithm of the summation term from the likelihood as:
+
+  $$f_j = f_j(p,s|k) = (k-j)  \log(2) + l(s,j) + l(p,k-j) - l(2p + s, k),$$
   
-  if(k > p + s) return(-Inf)
+and the log likelihood can be written as:
+
+$$\log L(p,s|k) = \log \left( \sum_{j=0}^k \exp (f_j) \right).$$
+
+The presence of the exponential in the formula risks undoing the efforts we have gone to in working with the logarithms. To maintain computational tractability we employ the Log-sum-exp trick: let $f^* = \max_j f_j,$ then the trick is to note the formula above is equivalent to
+
+$$\log L(p,s|k) = f^* + \log \left( \sum_{j=0}^k \exp \bigg( f_j - f^* \bigg) \right).$$
+ <details>
+<summary>**Sketch Proof**</summary>
+Note that for any constant $a$
+$$\exp(f_1) + \cdots + \exp(f_k) = \exp(a) \bigg( \exp(f_1 - a) + \cdots + \exp(f_k - a) \bigg),$$
+and so taking logarithms gives:
+
+$$\log \bigg(\exp(f_1) + \cdots + \exp(f_k) \bigg) = a + \log \bigg(\exp(f_1 - a) + \cdots + \exp(f_k- a) \bigg).$$
+The log-sum-exp trick is the special case where $a = \max f_j$.
+</details>
   
-  f <- purrr::map(0:k, function(j){
-    (k-j)*log(2) + lchoose(s,j) +lchoose(p,k-j) - lchoose(2*p + s,k)
-  })
-  
-  lL <- matrixStats::logSumExp(f)
-  
-  return(lL)
-}
+Note that since $f^*$ is on the log scale, although it may be the largest term it will still be computationally tractable. Each term to be exponentiated is now guaranteed to be less than $1$, and so within machine precision.
+
+ <details>
+<summary>*Implementation Code*</summary>
+```{r, code = readLines(here::here("R/socks_ll.R"))}
 ```
+</details>
 
-And to test that our function returns the values we expect:
-  ```{r}
-# test same values as in computational example
-lL <- log_likelihood(p = 3, s=4, k = 4)
-exp(lL)
-```
+&nbsp;
 
 # The Maximum Likelihood Estimate
+To motivate the need for a Bayesian analysis of the sock problem, we first consider the limitations of a maximum likelihood analysis.
 
-Whilst the purpose of this note is to consider a Bayesian analysis, first computing the Maximum Likelihood Estimate (MLE) gives us an opportunity to separate some of the initial computational aspects, from Bayesian specifics we will encounter further on.
+Recall that given the observed data ($k$ distinct socks), the maximum likelihood estimate for $(p,s)$ is the pair for which the observed data was most likely to have occurred: i.e. the values that maximize $L(p,s|k)$. Note that whilst $L$ denotes the log-likelihood, its maximum is achieved at the same point as the likelihood since it is a monotonic increasing function.
 
-The MLE is as described - we take a point estimate that the parameters $(p,s)$ that were most likely to generate the observed data $k$ are given by the values $p,s$ which maximise the (log) likelihood.
+Computationally we cannot enumerate all possible combinations of $p,s$, however evaluating the log-likelihood on a range of values is sufficient to indicate the potential challenges of a MLE analysis.
 
-Computationally we cannot enumerate all possible combinations of $p,s$, however we can reasonably assume that they fall within a reasonable range, and then only look for the maximum of the log-likelihood on this range.
 
-Given the values $k = 11$, we choose to search on the range $0 \leq p,s \leq 50$, which ranges from a minimum of $0$ socks, up to a maximum of $150$ (50 pairs, and 50 singletons).
-
-We define a data frame which will enumerate all possible pairs of $p,s$ on this range; this is facilitated using the `crossing` function from `tidyr`.
-
+<details>
+<summary>*MLE Code*</summary>
 ```{r}
-socks <- tidyr::crossing(p = 0:40, s = 0:20) %>%
-  mutate(
-    n = 2*p + s,
-    k = 11
+mle <- socks_likelihood_grid(p_max = 30, s_max = 20, k = 11)
+
+mle_plot <- grid_plot(mle, 2*p,s,ll) +
+  labs(
+    title = "The log likelihood",
+    x = "2p - Total socks that are in pairs",
+    y = "s - Singleton socks",
+    colour = "Log Likelihood"
   )
 ```
+</details>
 
-The log-likelihood of each pair $p,s$ can now be computed; since the function is not vectorised, we will need to use the `rowwise` function before calling `mutate`.
-
-```{r}
-socks <- socks %>% 
-  dplyr::rowwise() %>%
-  dplyr::mutate(
-    log_likelihood = log_likelihood(p,s,k)
-  )
+```{r, fig.align='center', echo = FALSE}
+mle_plot
 ```
 
-In the below we plot how the log-likelihood, for clariftywe restrict the plot to a reduced range of parameter values
+The plot indicates that the likelihood is maximized at values of $p = 0$, for $s \geq 11$. This should not be a surprise, since if all of the socks are distinct (so long as $s > k$) then there is a probability of $1$ that we will choose distinct socks.
 
-```{r, echo = TRUE}
-library(wesanderson)
+Further to this we note that away from this trivial case, the likelihood grows with the number of socks: as an example, even in the case that we considered no singleton socks, then as $p \rightarrow \infty$ the likelihood converges to $1$. Again this is to be expected as if you have many pairs to choose, the chances that you would both socks from a pair is low.
 
-ggplot(socks) + 
-  geom_point( aes(2*p, s, color = log_likelihood), size = 4) +
-  scale_color_gradientn(colours = wes_palette("Zissou1", 1000, type = "continuous")) +
-  coord_cartesian(xlim = c(0,60), ylim = c(0,20)) +
-  xlab("2p - Total socks that are in pairs") + ylab("s - Singleton socks") +
-  ggtitle("The Log Likelihood")
-```
+In all we see that a MLE analysis of the sock problem provides unenlightening answers: eg. implying that Karl Broman either only washed singleton socks, or that he washed infinitely many!
 
-To maximise the likelihood we would look to find the single point with the largest (closest to 0) log-likelihood, however the plot above indicates that such a point may not exist.
+In the next section we introduce a prior distribution over what we believe to be reasonable volumes of socks that may be in the washing machine, and show how this can be used in conjunction with the likelihood to derive results that are more in tune with our expectations.
 
-In fact this is entirely to be expected: take for example any scenario in which $p = 0$, and $s \geq 11$,then in all these cases the probability of observing $11$ distinct socks is $1$ - meaning that we have an entire range of parameter values that are all equally likely to have generated the data.
+<br>
 
-Other points to note in the graph are:
-  
-  * For combinations which have $n =2p + s \leq 11$, the log likelihood is $-\infty$, which are the points showing in grey.
-
-* More generally than the case of all socks being singletons, for any value $s$ the log likelihood grows as $p$ increases. This again matches expectations that the more different socks you have - the more likely you are to have drawn distinct socks.
-
-In all we see that maximum likelihood estimation will not help us to solve this particular problem! If we want to derive reasonable estimates for how many socks Karl Broman washed - we will need to bring in some knowledge (assumptions) about how people do their washing. And to do that, we will need to become Bayesians.
+#### *Next: [Part 2: Baath's Prior](2_baath_prior.html)*
 
 ```{r, echo = FALSE}
 knit_exit()
@@ -227,16 +235,16 @@ socks <- socks %>% mutate(log_prior = 1)
 Bayes theorem asserts that the posterior distribution is then proportional to the prior times the likelihood, or equivalently that the log of the posterior is equal to the sum of the log-prior and log-likelihood, plus a constant. We therefore define `log_posterior_tilde` to be this formula, excluding the (unknown) constant.
 
 ```{r}
-socks <- socks %>% mutate(log_posterior_tilde = log_prior + log_likelihood)
+socks <- socks %>% mutate(log_posterior_tilde = log_prior + socks_ll)
 ```
-Taking the exponential of this then returns the posterior distribution, up to some normalising constant. If we denote this un-normalised posterior by $\tilde P(p,s|k)$, then defining $Z = \sum_{p,s} \tilde P(p,s|k)$ for the sum of the un-normalised values one can confirm that the posterior probability is given by the formula
+Taking the exponential of this then returns the posterior distribution, up to some normalizing constant. If we denote this un-normalized posterior by $\tilde P(p,s|k)$, then defining $Z = \sum_{p,s} \tilde P(p,s|k)$ for the sum of the un-normalized values one can confirm that the posterior probability is given by the formula
 
 $$ P(p,s|k) = Z^{-1} \tilde P(p,s|k).$$
   There are two computation issues with this. The first is that in defining our data frame we have truncated the total domain on which the posterior distribution lives: in that we have focused only on scenarios where up to 50 pairs and 50 single socks are included. This issue will have little impact so long as our choice of priors do not put significant weight on such extreme scenarios.
 
 The second issue is computational: throughout we have described calculations on the log scale as these are less likely to run into computational *underflow* problems: i.e. working with very small numbers which require on calculations at the same scale of the computer's precision. In the final step of calculating $Z$ we risk undoing all this good work.
 
-For this reason, the implementation we use requires a small trick: before taking the exponential of $\log \tilde P(p,s|k)$ we first add on a constant to this. Adding a constant now will equate to multiplying by a constant on the natural scale, which will later be absorbed calculting $Z$. The advantage is that by adding this constant we can ensure that the summation required to compute $Z$ does not involve any numbers at the level of the machine precision. The constant we use is the negative of the maximum value of `log_posterior_tilde`, which will mean that on the natural scale the largest value of $\tilde P(p,s|k)$ will be $1$.
+For this reason, the implementation we use requires a small trick: before taking the exponential of $\log \tilde P(p,s|k)$ we first add on a constant to this. Adding a constant now will equate to multiplying by a constant on the natural scale, which will later be absorbed calculating $Z$. The advantage is that by adding this constant we can ensure that the summation required to compute $Z$ does not involve any numbers at the level of the machine precision. The constant we use is the negative of the maximum value of `log_posterior_tilde`, which will mean that on the natural scale the largest value of $\tilde P(p,s|k)$ will be $1$.
 
 ```{r}
 socks <- socks %>% 
@@ -248,12 +256,12 @@ socks <- socks %>%
 )
 ```
 
-And we are done! We now have an expression for the posterior and log-posterior (useful for plotting). In this particular run through of the steps we will not pay close attention to the outcome of the analysis: this is due to the choice of the flat prior $P(p,s) \propto 1$. Whilst convenient for the purpose of exposition, this particular choice of prior is *improper*: meaning that it is not itself a probability distribution. Though in some contexts it is possible to use an improper prior and obtain a proper posterior, this is not one of them. Directly calculating the resulting formula for the normalising constant on all pairs $(p,s)$ (i.e. not constrained to values $0 \leq p,s \leq 50$) would show that the normalising constant is $Z = \infty$.
+And we are done! We now have an expression for the posterior and log-posterior (useful for plotting). In this particular run through of the steps we will not pay close attention to the outcome of the analysis: this is due to the choice of the flat prior $P(p,s) \propto 1$. Whilst convenient for the purpose of exposition, this particular choice of prior is *improper*: meaning that it is not itself a probability distribution. Though in some contexts it is possible to use an improper prior and obtain a proper posterior, this is not one of them. Directly calculating the resulting formula for the normalizing constant on all pairs $(p,s)$ (i.e. not constrained to values $0 \leq p,s \leq 50$) would show that the normalizing constant is $Z = \infty$.
 
-Before moving along to defining priors we wrap all of the steps in the code above into a single function; we include in this function the ability to provide custom functions for the log likelhood (which otherwise defaults to the previously defined function), and the log prior (which otherwise defaults to the improper, constant, prior).
+Before moving along to defining priors we wrap all of the steps in the code above into a single function; we include in this function the ability to provide custom functions for the log likelihood (which otherwise defaults to the previously defined function), and the log prior (which otherwise defaults to the improper, constant, prior).
 
 ```{r}
-socks_bayes <- function(p_max = 50, s_max = 50, k = 11, log_likelihood = NULL, log_prior = NULL){
+socks_bayes <- function(p_max = 50, s_max = 50, k = 11, socks_ll = NULL, log_prior = NULL){
 
   
   if(is.null(log_prior)){
@@ -269,11 +277,11 @@ socks_bayes <- function(p_max = 50, s_max = 50, k = 11, log_likelihood = NULL, l
       n = 2*p + s,
       k = k,
       
-      log_likelihood = log_likelihood(p,s,k),
+      socks_ll = socks_ll(p,s,k),
       log_prior = log_prior(p,s),
       prior = exp(log_prior),
 
-      log_posterior_tilde = log_prior + log_likelihood,
+      log_posterior_tilde = log_prior + socks_ll,
 
       log_posterior_tilde = log_posterior_tilde - max(log_posterior_tilde),
 
@@ -283,7 +291,7 @@ socks_bayes <- function(p_max = 50, s_max = 50, k = 11, log_likelihood = NULL, l
       log_posterior = log(posterior)
   )
 
-  socks <- socks %>% select(p,s,n,k, log_prior, log_likelihood, prior, log_posterior, posterior)
+  socks <- socks %>% select(p,s,n,k, log_prior, socks_ll, prior, log_posterior, posterior)
 
   return(socks)
 }
@@ -336,7 +344,7 @@ Without providing full details, following these steps mathematically leads to th
 $$
 P(p,s) = P_{\mu,\sigma}(2p+s) \left\{ F_{\alpha,\beta}\left(\frac{2p +1}{2\lfloor p + s/2 \rfloor}\right) - F_{\alpha,\beta}\left(\frac{2p -1}{2\lfloor p + s/2 \rfloor}\right) \right\},
 $$
-where $F_{\alpha,\beta}(t) = P_{\alpha, \beta}(\theta \leq t)$ is the cummulative density of the Beta distribution; the term in braces corresponds to the probability that $\theta$ lies in the range of values that when multiplied by $2p + s$, and rounded to the nearest integer returns the answer of $p$.
+where $F_{\alpha,\beta}(t) = P_{\alpha, \beta}(\theta \leq t)$ is the cumulative density of the Beta distribution; the term in braces corresponds to the probability that $\theta$ lies in the range of values that when multiplied by $2p + s$, and rounded to the nearest integer returns the answer of $p$.
 
 We define the prior below
 
@@ -380,7 +388,8 @@ The 2D density plot below shows how the prior distribution varies over combinati
 ```{r, echo = FALSE}
 library(wesanderson)
 
-df %>% filter(p <= 30, s <= 10) %>% ggplot(aes(2*p, s, color = prior)) + geom_point(size = 4) +
+df %>%
+  filter(p <= 30, s <= 10) %>% ggplot(aes(2*p, s, color = prior)) + geom_point(size = 4) +
   scale_color_gradientn(colours = wes_palette("Zissou1", 1000, type = "continuous")) +
     scale_y_continuous(breaks = seq(0,50,by=4)) +
   xlab("2p - Total socks that are in pairs") + ylab("s - Singleton socks") +
@@ -391,7 +400,7 @@ df %>% filter(p <= 30, s <= 10) %>% ggplot(aes(2*p, s, color = prior)) + geom_po
 Having defined the prior distribution, and already having described the processing steps to derive the posterior, we can now immediately obtain the posterior distribution:
 
 ```{r}
-socks_baath <- socks_bayes(p_max = 50, s_max = 50, k = 11, log_likelihood = log_likelihood, log_prior = log_prior_baath)
+socks_baath <- socks_bayes(p_max = 50, s_max = 50, k = 11, socks_ll = socks_ll, log_prior = log_prior_baath)
 ```
 
 ```{r}
@@ -488,7 +497,7 @@ df %>% filter(p <= 30, s <= 10) %>% ggplot(aes(2*p, s, color = prior)) + geom_po
 Having defined the prior distribution, and already having described the processing steps to derive the posterior, we can now immediately obtain the posterior distribution:
   
   ```{r}
-socks_factored <- socks_bayes(p_max = 50, s_max = 50, k = 11, log_likelihood = log_likelihood, log_prior = log_prior_factored)
+socks_factored <- socks_bayes(p_max = 50, s_max = 50, k = 11, socks_ll = socks_ll, log_prior = log_prior_factored)
 ```
 
 ```{r}
@@ -537,19 +546,19 @@ $$
   \frac{ \binom{k}{1} \sum_{j=0}^s 2^{k-j} \binom{s}{j} \binom{p}{k-j} }{ \binom{2p + s}{k + 1}} = k \frac{\binom{2p+s}{k}}{\binom{2p+s}{k+1}}  L(p,s|k) = \frac{ k (k+1) }{2p+s - k} L(p,s|k)
 $$
   ```{r}
-log_likelihood_stopped <- function(p,s,k){
+socks_ll_stopped <- function(p,s,k){
   
   if(k + 1> 2*p + s){ return(-Inf)}
   
-  log(k) + log(k+1) - log(2*p + s -k) + log_likelihood(p,s,k)
+  log(k) + log(k+1) - log(2*p + s -k) + socks_ll(p,s,k)
   
 }
 
-log_likelihood_stopped <- Vectorize(log_likelihood_stopped)
+socks_ll_stopped <- Vectorize(socks_ll_stopped)
 ```
 
 ```{r}
-socks_stopped <- socks_bayes(p_max = 50, s_max = 50, k = 11, log_likelihood = log_likelihood_stopped, log_prior = log_prior_baath)
+socks_stopped <- socks_bayes(p_max = 50, s_max = 50, k = 11, socks_ll = socks_ll_stopped, log_prior = log_prior_baath)
 ```
 
 ```{r}
@@ -579,3 +588,4 @@ total_socks_stopped <- socks_stopped %>% group_by(n) %>%
 ```{r, echo = FALSE}
 total_socks_stopped %>% filter(prior > 0, n <= 100) %>% ggplot(aes(n, posterior))  +geom_bar(stat="identity", position= "dodge") + geom_line(aes(n, prior), linetype = "dashed")
 ```
+

@@ -6,14 +6,16 @@ output:
     toc_depth: 1
 always_allow_html: yes
 ---
+```{r,echo= FALSE,message = FALSE, warning = FALSE, code = readLines(here::here("R/setup.R"))}
+```
 
 The problem of *Broman's Socks* was first analysed in a [blog post](http://www.sumsar.net/blog/2014/10/tiny-data-and-the-socks-of-karl-broman/) by Rasmus Baath, following a [tweet](https://twitter.com/kwbroman/status/523221976001679360) from Karl Broman. The problem can be stated as:
 
 > Given that the first 11 socks that Karl Broman removed from his washing machine were all distinct, how many socks do we believe were in the washing machine to begin with?
 
-Baath's analysis procedes using Approximate Bayesian Computation (ABC), and is an excellent introduction to this methodology. ABC is a partially Bayesian approach to moddeling, which replaces specifying the likelihood function of the model with a sampling process to approximate the likelihood.
+Baath's analysis proceeds using Approximate Bayesian Computation (ABC), and is an excellent introduction to this methodology. ABC is a partially Bayesian approach to modeling, which replaces specifying the likelihood function of the model with a sampling process to approximate the likelihood.
 
-ABC is a powerful tool in settings where the likeilhood may be hard to define, or as a learning tool to lower the barrier to entry for analysts without a strong knowledge of probability. This comes at a cost of increased computational requirement, and biases introduced by sampling processes.
+ABC is a powerful tool in settings where the likelihood may be hard to define, or as a learning tool to lower the barrier to entry for analysts without a strong knowledge of probability. This comes at a cost of increased computational requirement, and biases introduced by sampling processes.
 
 In this analysis we demonstrate that the likelihood for this particular problem can be determined exactly, enabling a fully Bayesian analysis of Karl Broman's washing machine.
 
@@ -26,3 +28,7 @@ We also consider further iterations of the problem, and the sensitivity that the
 Whilst the distributions change quite dramatically under these changes in assumptions, what is clear is that Karl Broman washes a lot of socks.
 
 Throughout we assume a basic familiarity with Bayesian methods, and in particular the notion of the likelihood and Bayes formula for combining this with prior distributions. Following the derivation of the likelihood functions will require some familiarity with combinatorics; however readers unfamiliar with this can skip the mathematical detail of the derivation.
+
+<br>
+
+#### *Next: [Part 1: The Likelihood](1_likelihood.html)*

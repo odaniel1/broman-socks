@@ -1,6 +1,10 @@
 ---
   title: "Baath's Model"
 ---
+
+```{r,echo= FALSE,message = FALSE, warning = FALSE, code = readLines(here::here("R/setup.R"))}
+```
+
 ```{r, echo = FALSE}
 library(tidyverse)
 
