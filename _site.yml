@@ -4,7 +4,7 @@ navbar:
   left:
     - text: "The Likelihood"
       href: 1_likelihood.html
-    - text: "Baath's Prior"
+    - text: "Prior to Posterior"
       href: 2_baath_prior.html
 output_dir: "."
 output:

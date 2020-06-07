@@ -11,7 +11,7 @@
 
 
 
-<title>Baath’s Model</title>
+<title>From Prior Beliefs to Posterior Inference</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -275,7 +275,7 @@ $(document).ready(function () {
   <a href="1_likelihood.html">The Likelihood</a>
 </li>
 <li>
-  <a href="2_baath_prior.html">Baath's Prior</a>
+  <a href="2_baath_prior.html">Prior to Posterior</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -289,18 +289,17 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Baath’s Model</h1>
+<h1 class="title toc-ignore">From Prior Beliefs to Posterior Inference</h1>
 
 </div>
 
 
-<pre><code>## ── Attaching packages ───────────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
-<pre><code>## ✓ tibble  3.0.1     ✓ stringr 1.4.0
-## ✓ readr   1.3.1     ✓ forcats 0.5.0</code></pre>
-<pre><code>## ── Conflicts ──────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-## x dplyr::filter()          masks stats::filter()
-## x kableExtra::group_rows() masks dplyr::group_rows()
-## x dplyr::lag()             masks stats::lag()</code></pre>
+<p>We saw in the previous section that to inference based on maximum likelihood estimation returns disappointing results, even in the instance where we introduce hard constraints on the possible realistic parameter values.</p>
+<p>In this section we look at how this hard assumption about the plausible total number of socks can be replaced with a softer appraoch where we specify our belief about the total number as a distribution. This distribution is specified independently of the observed data (eg. in this case we do not factor in the observation of <span class="math inline">\(k = 11\)</span> distinct socks), and as such it is called the <em>prior</em> distribution as it represents our beliefs prior to seeing any data.</p>
+<p>We will then explain how we can derive a distribution for the number of socks which takes into account both our prior belief, and the observed data; this will be the <em>posterior</em> distribution, and is fully determined by combining the prior with the likelihood function.</p>
+<p>This method of having a structured way of accounting for prior knowledge in statistics is often considered the central benefit (or detriment, depending on your school of thought) of Bayesian analysis. It is worth noting, however, that there are subtler distinctions that</p>
+<p>Bayes theorem will enable us to combine</p>
+<p>One of the distinctions between the Bayesian approach to statistics and alternative schools of thought (eg. frequentist) is the The Bayesian approach to statistics differs from the</p>
 <pre class="r"><code>socks_bayes &lt;- function(p_max = 50, s_max = 50, k = 11, log_likelihood = NULL, log_prior = NULL){
 
   if(is.null(log_prior)){
@@ -334,12 +333,12 @@ $(document).ready(function () {
 
   return(socks)
 }</code></pre>
-<div id="baaths-prior" class="section level1">
-<h1>Baath’s Prior</h1>
-<p>Our first analysis will replicate that conducted by Baath, who constructs the prior on <span class="math inline">\((p,s)\)</span> as follows.</p>
+<div id="bååths-prior" class="section level1">
+<h1>Bååth’s Prior</h1>
+<p>Our first analysis will replicate that conducted by Bååth, who constructs the prior on <span class="math inline">\((p,s)\)</span> as follows.</p>
 <div id="defining-the-prior" class="section level2">
 <h2>Defining the Prior</h2>
-<p>First a prior is placed on <span class="math inline">\(n\)</span>, the overall total number of socks that are believed to be in the washing machine. He chooses to use a negative binomial distribution. Baath chooses parameters for this distribution based on prior knowledge that Broman is one in a family of four, and a belief that Broman only runs one wash per week, and as such decided to use a negative binomial distribution with mean <span class="math inline">\(\mu = 30\)</span> (corresponding to 15 pairs of socks), with a standard deviation of <span class="math inline">\(\sigma = 15\)</span>; we denote this distribution by <span class="math inline">\(P_{\mu,\sigma}(n)\)</span>.</p>
+<p>First a prior is placed on <span class="math inline">\(n\)</span>, the overall total number of socks that are believed to be in the washing machine. He chooses to use a negative binomial distribution. Bååth chooses parameters for this distribution based on prior knowledge that Broman is one in a family of four, and a belief that Broman only runs one wash per week, and as such decided to use a negative binomial distribution with mean <span class="math inline">\(\mu = 30\)</span> (corresponding to 15 pairs of socks), with a standard deviation of <span class="math inline">\(\sigma = 15\)</span>; we denote this distribution by <span class="math inline">\(P_{\mu,\sigma}(n)\)</span>.</p>
 <pre class="r"><code>prior_n &lt;- function(n, mu = 30, sigma = 15){
   
   size &lt;- -mu^2 / (mu - sigma^2)
@@ -352,10 +351,10 @@ $(document).ready(function () {
 ## Please use `tibble()` instead.
 ## This warning is displayed once every 8 hours.
 ## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+<p><img src="2_baath_prior_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Having determined the total number of socks that he expects there to be in any given wash, Bååth then uses a prior for the proportion of socks that are pairs, as opposed to singletons. Denoting this proportion <span class="math inline">\(\theta = 2p/(2p + s)\)</span>, Bååth places on this a Beta prior (the natural choice for a proportion measure between 0 and 1). This has prior parameters <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span> which are chosen to be <span class="math inline">\(\alpha = 15, \, \beta = 2\)</span>, which were chosen to conform with his own laundry habits. We will denote this distribution by <span class="math inline">\(P_{\alpha,\beta}(\theta)\)</span>.</p>
 <p><img src="2_baath_prior_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<p>Having determined the total number of socks that he expects there to be in any given wash, Baath then uses a prior for the proportion of socks that are pairs, as opposed to singletons. Denoting this proportion <span class="math inline">\(\theta = 2p/(2p + s)\)</span>, Baath places on this a Beta prior (the natural choice for a proportion measure between 0 and 1). This has prior parameters <span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\beta\)</span> which are chosen to be <span class="math inline">\(\alpha = 15, \, \beta = 2\)</span>, which were chosen to conform with his own laundry habits. We will denote this distribution by <span class="math inline">\(P_{\alpha,\beta}(\theta)\)</span>.</p>
-<p><img src="2_baath_prior_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<p>We now have to work out how to turn priors on <span class="math inline">\(n\)</span> and <span class="math inline">\(\theta\)</span> into priors for <span class="math inline">\(p,s\)</span>; this is handled fairly easily in Baath’s original computation approach through a sampling process:</p>
+<p>We now have to work out how to turn priors on <span class="math inline">\(n\)</span> and <span class="math inline">\(\theta\)</span> into priors for <span class="math inline">\(p,s\)</span>; this is handled fairly easily in Bååth’s original computation approach through a sampling process:</p>
 <ol style="list-style-type: decimal">
 <li>Sample <span class="math inline">\(n\)</span>, and <span class="math inline">\(\theta\)</span> from the respective prior distributions defined above.</li>
 <li>Let <span class="math inline">\(p = \left[ \theta \rfloor n/2 \lfloor \right]\)</span>, where <span class="math inline">\(\rfloor x \lfloor\)</span> denotes the floor of <span class="math inline">\(x\)</span>, and <span class="math inline">\(\left[x\right]\)</span> denotes <span class="math inline">\(x\)</span> rounded to the nearest integer.</li>
@@ -388,7 +387,7 @@ P(p,s) = P_{\mu,\sigma}(2p+s) \left\{ F_{\alpha,\beta}\left(\frac{2p +1}{2\lfloo
 }
 
 log_prior_baath &lt;- Vectorize(log_prior_baath)</code></pre>
-<p>The 2D density plot below shows how the prior distribution varies over combinations of (2p,s); the highest density goes to the scenario in which there are a total of 19 socks, made up of <span class="math inline">\(p = 8\)</span> pairs and <span class="math inline">\(s = 3\)</span> singletons. <img src="2_baath_prior_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>The 2D density plot below shows how the prior distribution varies over combinations of (2p,s); the highest density goes to the scenario in which there are a total of 19 socks, made up of <span class="math inline">\(p = 8\)</span> pairs and <span class="math inline">\(s = 3\)</span> singletons. <img src="2_baath_prior_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <pre class="r"><code>knitr::knit_exit()</code></pre>
 </div>
 </div>

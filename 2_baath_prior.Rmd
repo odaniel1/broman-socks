@@ -1,27 +1,21 @@
 ---
-  title: "Baath's Model"
+  title: "From Prior Beliefs to Posterior Inference"
 ---
-
 ```{r,echo= FALSE,message = FALSE, warning = FALSE, code = readLines(here::here("R/setup.R"))}
 ```
 
-```{r, echo = FALSE}
-library(tidyverse)
+We saw in the previous section that to inference based on maximum likelihood estimation returns disappointing results, even in the instance where we introduce hard constraints on the possible realistic parameter values.
 
+In this section we look at how this hard assumption about the plausible total number of socks can be replaced with a softer appraoch where we specify our belief about the total number as a distribution. This distribution is specified independently of the observed data (eg. in this case we do not factor in the observation of $k = 11$ distinct socks), and as such it is called the *prior* distribution as it represents our beliefs prior to seeing any data.
 
-log_likelihood <- function(p,s,k){
-  
-  if(k > p + s) return(-Inf)
-  
-  f <- purrr::map(0:k, function(j){
-    (k-j)*log(2) + lchoose(s,j) +lchoose(p,k-j) - lchoose(2*p + s,k)
-  })
-  
-  lL <- matrixStats::logSumExp(f)
-  
-  return(lL)
-}
-```
+We will then explain how we can derive a distribution for the number of socks which takes into account both our prior belief, and the observed data; this will be the *posterior* distribution, and is fully determined by combining the prior with the likelihood function.
+
+This method of having a structured way of accounting for prior knowledge in statistics is often considered the central benefit (or detriment, depending on your school of thought) of Bayesian analysis. It is worth noting, however, that there are subtler distinctions that 
+
+Bayes theorem will enable us to combine 
+
+One of the distinctions between the Bayesian approach to statistics and alternative schools of thought (eg. frequentist) is the 
+The Bayesian approach to statistics differs from the 
   
 ```{r}
 socks_bayes <- function(p_max = 50, s_max = 50, k = 11, log_likelihood = NULL, log_prior = NULL){
@@ -61,12 +55,12 @@ socks_bayes <- function(p_max = 50, s_max = 50, k = 11, log_likelihood = NULL, l
 
 
 
-# Baath's Prior
-Our first analysis will replicate that conducted by Baath, who constructs the prior on $(p,s)$ as follows.
+# B&aring;&aring;th's Prior
+Our first analysis will replicate that conducted by B&aring;&aring;th, who constructs the prior on $(p,s)$ as follows.
 
 ## Defining the Prior
 
-First a prior is placed on $n$, the overall total number of socks that are believed to be in the washing machine. He chooses to use a negative binomial distribution. Baath chooses parameters for this distribution based on prior knowledge that Broman is one in a family of four, and a belief that Broman only runs one wash per week, and as such decided to use a negative binomial distribution with mean $\mu = 30$ (corresponding to 15 pairs of socks), with a standard deviation of $\sigma = 15$; we denote this distribution by $P_{\mu,\sigma}(n)$.
+First a prior is placed on $n$, the overall total number of socks that are believed to be in the washing machine. He chooses to use a negative binomial distribution. B&aring;&aring;th chooses parameters for this distribution based on prior knowledge that Broman is one in a family of four, and a belief that Broman only runs one wash per week, and as such decided to use a negative binomial distribution with mean $\mu = 30$ (corresponding to 15 pairs of socks), with a standard deviation of $\sigma = 15$; we denote this distribution by $P_{\mu,\sigma}(n)$.
 
 ```{r}
 prior_n <- function(n, mu = 30, sigma = 15){
@@ -84,14 +78,14 @@ data_frame(n = 1:100, prior_n = prior_n(n)) %>% ggplot(aes(n, prior_n)) +geom_ba
   ggtitle("Prior distribution for n, the total number of socks.")
 ```
 
-Having determined the total number of socks that he expects there to be in any given wash, Baath then uses a prior for the proportion of socks that are pairs, as opposed to singletons. Denoting this proportion $\theta = 2p/(2p + s)$, Baath places on this a Beta prior (the natural choice for a proportion measure between 0 and 1). This has prior parameters $\alpha$, $\beta$ which are chosen to be $\alpha = 15, \, \beta = 2$, which were chosen to conform with his own laundry habits. We will denote this distribution by $P_{\alpha,\beta}(\theta)$.
+Having determined the total number of socks that he expects there to be in any given wash, B&aring;&aring;th then uses a prior for the proportion of socks that are pairs, as opposed to singletons. Denoting this proportion $\theta = 2p/(2p + s)$, B&aring;&aring;th places on this a Beta prior (the natural choice for a proportion measure between 0 and 1). This has prior parameters $\alpha$, $\beta$ which are chosen to be $\alpha = 15, \, \beta = 2$, which were chosen to conform with his own laundry habits. We will denote this distribution by $P_{\alpha,\beta}(\theta)$.
 
 ```{r, echo = FALSE}
 data_frame(theta = c(0,1)) %>% ggplot(aes(theta)) + stat_function(fun = function(theta){ dbeta(theta, shape1= 15, shape2 = 2)}) +
   ylab("Probability Density") + ggtitle("Prior distribution for the proportion of socks that are in pairs.")
 ```
 
-We now have to work out how to turn priors on $n$ and $\theta$ into priors for $p,s$; this is handled fairly easily in Baath's original computation approach through a sampling process:
+We now have to work out how to turn priors on $n$ and $\theta$ into priors for $p,s$; this is handled fairly easily in B&aring;&aring;th's original computation approach through a sampling process:
   
   1. Sample $n$, and $\theta$ from the respective prior distributions defined above.
   2. Let $p =  \left[ \theta \rfloor n/2 \lfloor \right]$, where $\rfloor x \lfloor$ denotes the floor of $x$, and $\left[x\right]$ denotes $x$ rounded to the nearest integer.
@@ -152,7 +146,7 @@ df %>% filter(p <= 30, s <= 10) %>% ggplot(aes(2*p, s, color = prior)) + geom_po
   scale_color_gradientn(colours = wes_palette("Zissou1", 1000, type = "continuous")) +
     scale_y_continuous(breaks = seq(0,50,by=4)) +
   xlab("2p - Total socks that are in pairs") + ylab("s - Singleton socks") +
-  ggtitle("Baath's Prior distribution over (2p,s).")
+  ggtitle("B&aring;&aring;th's Prior distribution over (2p,s).")
 ```
 
 
@@ -177,7 +171,7 @@ socks_baath %>% filter(p <= 30, s <= 10) %>%ggplot(aes(2*p, s, color = posterior
   scale_color_gradientn(colours = wes_palette("Zissou1", 1000, type = "continuous")) +
   scale_y_continuous(breaks = seq(0,50,by=4)) +
   xlab("2p - Total socks that are in pairs") + ylab("s - Singleton socks") +
-  ggtitle("Baath's Posterior distribution over (2p,s).")
+  ggtitle("B&aring;&aring;th's Posterior distribution over (2p,s).")
 ```
 
 Alternatively we can calculate the density of total socks - disregarding the breakdown into pairs and singletons.
@@ -201,11 +195,11 @@ total_socks_baath %>% filter(prior > 0) %>% ggplot(aes(n, posterior)) + geom_lin
 
 
 # A Factored Prior
-Baath's prior assumes that singleton socks make up a certain proportion of the total number of socks, and then puts a prior on this proportion, and the total number.
+B&aring;&aring;th's prior assumes that singleton socks make up a certain proportion of the total number of socks, and then puts a prior on this proportion, and the total number.
 
 An alternative approach is to assume that the number of pairs of socks, and the number of singleton socks are independently distributed. One advantage of this model is the relative simplicity in defining the prior, which we no longer have to re-parameterise from $(n,\theta)$ to $(p,s)$. Whether or not this independence assumption is more reflective of actual washing practice remains open to debate.
 
-Like Baath, we will use negative binomial distributions to model the number of socks, but now use separate distributions for each of $p$, and $s$. Following Baath (for reasons that will become clear below) we will parameterise the distributions in terms of the mean and standard deviation of the distributions:
+Like B&aring;&aring;th, we will use negative binomial distributions to model the number of socks, but now use separate distributions for each of $p$, and $s$. Following B&aring;&aring;th (for reasons that will become clear below) we will parameterise the distributions in terms of the mean and standard deviation of the distributions:
   
   $$ p \sim \text{NBin}(\mu_p, \sigma_p), \qquad s \sim \text{NBin}(\mu_s, \sigma_s).$$
   In the natural parameterisation of the negative binomial, this equates to parameters
@@ -213,14 +207,14 @@ Like Baath, we will use negative binomial distributions to model the number of s
 $$\mu = \frac{qr}{(1-q)}, \qquad \sigma^2 = \frac{\mu}{(1-q)}$$
   Or:
   $$ q = 1 - \mu/\sigma^2, \qquad r = \mu  \frac{\mu/\sigma^2}{1 - \mu/\sigma^2} = \frac{\mu}{\sigma^2/\mu - 1} = \frac{\mu^2}{\sigma^2 - \mu}$$
-  To closely match the prior that Baath constructed, we want that $\mathbf E[ 2p + s] = 2\mu_p = \mu_s = 30$, and moreover that $\mathbf E[(2p)/(s+2p)] = 15/17$
+  To closely match the prior that B&aring;&aring;th constructed, we want that $\mathbf E[ 2p + s] = 2\mu_p = \mu_s = 30$, and moreover that $\mathbf E[(2p)/(s+2p)] = 15/17$
   
   $$ \text{Var}(2p + s) = 4 \text{Var}(p) + \text{Var}(s) = 15^2$$.
 
-where we choose to parameterise the distributions via their mean and , which is the parameterisation used by Baath. Our intent will be to choose the parameters to closely match those used by Baath for the distribution We will make use of the  particular property of negative binomial distributions
+where we choose to parameterise the distributions via their mean and , which is the parameterisation used by B&aring;&aring;th. Our intent will be to choose the parameters to closely match those used by B&aring;&aring;th for the distribution We will make use of the  particular property of negative binomial distributions
 
 
-For our purposes we will assume that the number of pairs and singletons is Poisson distributed with respective means $\mu_p = 13.25$ and $\mu_s = 3.5$; note that the parameters have been chosen so that the summary statistics for the prior are close to those of Baath. 
+For our purposes we will assume that the number of pairs and singletons is Poisson distributed with respective means $\mu_p = 13.25$ and $\mu_s = 3.5$; note that the parameters have been chosen so that the summary statistics for the prior are close to those of B&aring;&aring;th. 
 p2 = rnbinom(n = n, mu = 13, size = 5.5),
 
 ```{r}
@@ -256,7 +250,7 @@ df %>% filter(p <= 30, s <= 10) %>% ggplot(aes(2*p, s, color = prior)) + geom_po
   scale_color_gradientn(colours = wes_palette("Zissou1", 1000, type = "continuous")) +
   scale_y_continuous(breaks = seq(0,50,by=4)) +
   xlab("2p - Total socks that are in pairs") + ylab("s - Singleton socks") +
-  ggtitle("Baath's Prior distribution over (2p,s).")
+  ggtitle("B&aring;&aring;th's Prior distribution over (2p,s).")
 ```
 
 ## Posterior Analysis
@@ -276,7 +270,7 @@ socks_factored %>% filter(p <= 30, s <= 10) %>%ggplot(aes(2*p, s, color = poster
   scale_color_gradientn(colours = wes_palette("Zissou1", 1000, type = "continuous")) +
   scale_y_continuous(breaks = seq(0,50,by=4)) +
   xlab("2p - Total socks that are in pairs") + ylab("s - Singleton socks") +
-  ggtitle("Baath's Posterior distribution over (2p,s).")
+  ggtitle("B&aring;&aring;th's Posterior distribution over (2p,s).")
 ```
 
 Alternatively we can calculate the density of total socks - disregarding the breakdown into pairs and singletons.
@@ -298,7 +292,7 @@ total_socks_factored %>% filter(prior > 0) %>% ggplot(aes(n, posterior)) + geom_
 ```
 
 # Was the 11th Sock a Stopping Time?
-The analysis so far, and that of Baath, has supposed that Broman chose to stop at the 11th sock by free will, before continuing to unload his washing. An alternative hypothesis might be that Broman saw that the 12th sock was going to break this streak, and so decided to tweet at this point.
+The analysis so far, and that of B&aring;&aring;th, has supposed that Broman chose to stop at the 11th sock by free will, before continuing to unload his washing. An alternative hypothesis might be that Broman saw that the 12th sock was going to break this streak, and so decided to tweet at this point.
 
 This is not an update to our prior beliefs of the parameters, but rather to the probabilistic model itself, i.e.a change in the likelihood.
 
@@ -337,7 +331,7 @@ socks_stopped %>% filter(p <= 30, s <= 10) %>%ggplot(aes(2*p, s, color = posteri
   scale_color_gradientn(colours = wes_palette("Zissou1", 1000, type = "continuous")) +
   scale_y_continuous(breaks = seq(0,50,by=4)) +
   xlab("2p - Total socks that are in pairs") + ylab("s - Singleton socks") +
-  ggtitle("Baath's Posterior distribution over (2p,s).")
+  ggtitle("B&aring;&aring;th's Posterior distribution over (2p,s).")
 ```
 ```{r}
 total_socks_stopped <- socks_stopped %>% group_by(n) %>%

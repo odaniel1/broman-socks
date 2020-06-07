@@ -179,7 +179,7 @@ Note that since $f^*$ is on the log scale, although it may be the largest term i
 
 &nbsp;
 
-# The Maximum Likelihood Estimate
+# Maximum Likelihood Estimation
 To motivate the need for a Bayesian analysis of the sock problem, we first consider the limitations of a maximum likelihood analysis.
 
 Recall that given the observed data ($k$ distinct socks), the maximum likelihood estimate for $(p,s)$ is the pair for which the observed data was most likely to have occurred: i.e. the values that maximize $L(p,s|k)$. Note that whilst $L$ denotes the log-likelihood, its maximum is achieved at the same point as the likelihood since it is a monotonic increasing function.
@@ -210,9 +210,19 @@ The plot indicates that the likelihood is maximized at values of $p = 0$, for $s
 
 Further to this we note that away from this trivial case, the likelihood grows with the number of socks: as an example, even in the case that we considered no singleton socks, then as $p \rightarrow \infty$ the likelihood converges to $1$. Again this is to be expected as if you have many pairs to choose, the chances that you would both socks from a pair is low.
 
-In all we see that a MLE analysis of the sock problem provides unenlightening answers: eg. implying that Karl Broman either only washed singleton socks, or that he washed infinitely many!
+# Introducing Constraints
 
-In the next section we introduce a prior distribution over what we believe to be reasonable volumes of socks that may be in the washing machine, and show how this can be used in conjunction with the likelihood to derive results that are more in tune with our expectations.
+A potential resolution to these limitations would be to introduce hard constraints on the problem: for instance enforcing a strict limit to the size of the washing machine capacity, and hence capping the potential values of $s,\, p$.
+
+**Example**
+
+Suppose for simplicity we make the assumption that there are no singleton socks at all, forcing $s = 0$, and that at most the washing machine capacity could hold $P$ pairs of socks (eg $P = 60$).
+
+From the logic above, and evident in the plot, in this constrained model the likelihood will be maximised at the boundary value $P$, eg. the most likely scenario (under this model) is that Karl Broman completely filled his machine with socks.
+
+This demonstrates the level of sensitivity that a MLE approach would have to setting any hard constraints - in fact in this example the constraint determines the estimate in a trivial way.
+
+In the next section we introduce the soften the constraint by introducing a distribution over the range of possible values that $s,\,p$ can take, and demonstrate how this can be combined with the likelihood to derive estimates for the sock problem.
 
 <br>
 
