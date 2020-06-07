@@ -7,7 +7,8 @@ output:
     toc_float: yes
     toc_depth: 1
 ---
-
+```{r,echo= FALSE,message = FALSE, warning = FALSE, code = readLines(here::here("R/setup.R"))}
+```
 A natural approach to real world problem solving is to ask which situation was the most likely to have produced some observed event. In our context: how many socks would there have to have been in the washing machine for us to have the greatest chance of the first 11 socks being distinct?
 
 To answer this mathematically, we could look to enumerate the probability of seeing 11 distinct socks for all possible number of socks in the wash, and then choose the number which assigned the greatest probability, eg. for which the event was most likely.
