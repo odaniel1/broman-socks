@@ -10,11 +10,11 @@ always_allow_html: yes
 ```{r,echo= FALSE,message = FALSE, warning = FALSE, code = readLines(here::here("R/setup.R"))}
 ```
 
-The problem of *Broman's Socks* was first analysed in a [blog post](http://www.sumsar.net/blog/2014/10/tiny-data-and-the-socks-of-karl-broman/) by Rasmus Baath, following a [tweet](https://twitter.com/kwbroman/status/523221976001679360) from Karl Broman. The problem can be stated as:
+The problem of *Broman's Socks* was first analysed in a [blog post](http://www.sumsar.net/blog/2014/10/tiny-data-and-the-socks-of-karl-broman/) by Rasmus B&aring;&aring;th, following a [tweet](https://twitter.com/kwbroman/status/523221976001679360) from Karl Broman. The problem can be stated as:
 
 > Given that the first 11 socks that Karl Broman removed from his washing machine were all distinct, how many socks do we believe were in the washing machine to begin with?
 
-Baath uses Approximate Bayesian Computation (ABC) to answer the question, and is an excellent introduction to this methodology. ABC is a partially Bayesian approach to modelling, which replaces specifying the likelihood function of the model with a sampling process to approximate it.
+B&aring;&aring;th uses Approximate Bayesian Computation (ABC) to answer the question, and is an excellent introduction to this methodology. ABC is a partially Bayesian approach to modelling, which replaces specifying the likelihood function of the model with a sampling process to approximate it.
 
 ABC is a powerful tool in settings where the likelihood may be hard to define, or as a learning tool to lower the barrier to entry for analysts without a background in probability or statistics. This comes at the cost of increased computational requirement, biases introduced by sampling processes, and arguably still requires the user to have the same level of mathematical understanding to ensure the sampled statistics are robust.
 
@@ -23,7 +23,7 @@ In this analysis we demonstrate that with a willingness to perform some computat
 
 * In the first section, we define the likelihood and derive an exact formula for it, before demonstrating that a classical (maximum likelihood) approach to solving the sock problem fails, neccesitating a Bayesian analysis.
 
-* The second section conducts a Bayesian analysis, first using the prior distribution assumed by Baath, and we derive the posterior distribution for the number of socks. We propose an alternative form of prior distribution, and observe the impact this has on posterior estimates.
+* The second section conducts a Bayesian analysis, first using the prior distribution assumed by B&aring;&aring;th, and we derive the posterior distribution for the number of socks. We propose an alternative form of prior distribution, and observe the impact this has on posterior estimates.
 
 * In the final section we consider the quesiton of whether there is more information in Broman's tweet than first appears: did he stop at 11 socks because the 12th would break the streak? We derive the likelihood for this *stopping time* model, and again assess the impact this has on our inference.
 

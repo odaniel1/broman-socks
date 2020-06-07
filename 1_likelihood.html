@@ -450,7 +450,7 @@ summarise_draws &lt;- tribble(
   &quot;No. All Distinct&quot;, sum(draws$all_distinct) %&gt;% digits(0, big.mark = &quot;,&quot;) %&gt;% as.character(),
   &quot;Prob. All Distinct&quot;, (sum(draws$all_distinct)/nrow(draws))  %&gt;% digits(3) %&gt;% as.character()
 ) %&gt;%
-kable( col.names = c(&quot;Summary&quot;, &quot;&quot;)) %&gt;%
+kable( col.names = c(&quot;Summary&quot;, &quot;&quot;), align = &quot;lr&quot;) %&gt;%
 kable_styling(
   bootstrap_options = &quot;condensed&quot;,
   full_width = FALSE,
@@ -464,7 +464,7 @@ kable_styling(
 <th style="text-align:left;">
 Summary
 </th>
-<th style="text-align:left;">
+<th style="text-align:right;">
 </th>
 </tr>
 </thead>
@@ -473,7 +473,7 @@ Summary
 <td style="text-align:left;">
 No. Draws
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 100,000
 </td>
 </tr>
@@ -481,7 +481,7 @@ No. Draws
 <td style="text-align:left;">
 No. All Distinct
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 61,480
 </td>
 </tr>
@@ -489,7 +489,7 @@ No. All Distinct
 <td style="text-align:left;">
 Prob. All Distinct
 </td>
-<td style="text-align:left;">
+<td style="text-align:right;">
 0.615
 </td>
 </tr>
@@ -546,8 +546,8 @@ socks_likelihood_grid &lt;- function(p_max,s_max,k, prior = NULL){
 </details>
 <p> </p>
 </div>
-<div id="the-maximum-likelihood-estimate" class="section level1">
-<h1>The Maximum Likelihood Estimate</h1>
+<div id="maximum-likelihood-estimation" class="section level1">
+<h1>Maximum Likelihood Estimation</h1>
 <p>To motivate the need for a Bayesian analysis of the sock problem, we first consider the limitations of a maximum likelihood analysis.</p>
 <p>Recall that given the observed data (<span class="math inline">\(k\)</span> distinct socks), the maximum likelihood estimate for <span class="math inline">\((p,s)\)</span> is the pair for which the observed data was most likely to have occurred: i.e. the values that maximize <span class="math inline">\(L(p,s|k)\)</span>. Note that whilst <span class="math inline">\(L\)</span> denotes the log-likelihood, its maximum is achieved at the same point as the likelihood since it is a monotonic increasing function.</p>
 <p>Computationally we cannot enumerate all possible combinations of <span class="math inline">\(p,s\)</span>, however evaluating the log-likelihood on a range of values is sufficient to indicate the potential challenges of a MLE analysis.</p>
@@ -566,8 +566,15 @@ mle_plot &lt;- grid_plot(mle, 2*p,s,ll) +
 <p><img src="1_likelihood_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The plot indicates that the likelihood is maximized at values of <span class="math inline">\(p = 0\)</span>, for <span class="math inline">\(s \geq 11\)</span>. This should not be a surprise, since if all of the socks are distinct (so long as <span class="math inline">\(s &gt; k\)</span>) then there is a probability of <span class="math inline">\(1\)</span> that we will choose distinct socks.</p>
 <p>Further to this we note that away from this trivial case, the likelihood grows with the number of socks: as an example, even in the case that we considered no singleton socks, then as <span class="math inline">\(p \rightarrow \infty\)</span> the likelihood converges to <span class="math inline">\(1\)</span>. Again this is to be expected as if you have many pairs to choose, the chances that you would both socks from a pair is low.</p>
-<p>In all we see that a MLE analysis of the sock problem provides unenlightening answers: eg. implying that Karl Broman either only washed singleton socks, or that he washed infinitely many!</p>
-<p>In the next section we introduce a prior distribution over what we believe to be reasonable volumes of socks that may be in the washing machine, and show how this can be used in conjunction with the likelihood to derive results that are more in tune with our expectations.</p>
+</div>
+<div id="introducing-constraints" class="section level1">
+<h1>Introducing Constraints</h1>
+<p>A potential resolution to these limitations would be to introduce hard constraints on the problem: for instance enforcing a strict limit to the size of the washing machine capacity, and hence capping the potential values of <span class="math inline">\(s,\, p\)</span>.</p>
+<p><strong>Example</strong></p>
+<p>Suppose for simplicity we make the assumption that there are no singleton socks at all, forcing <span class="math inline">\(s = 0\)</span>, and that at most the washing machine capacity could hold <span class="math inline">\(P\)</span> pairs of socks (eg <span class="math inline">\(P = 60\)</span>).</p>
+<p>From the logic above, and evident in the plot, in this constrained model the likelihood will be maximised at the boundary value <span class="math inline">\(P\)</span>, eg. the most likely scenario (under this model) is that Karl Broman completely filled his machine with socks.</p>
+<p>This demonstrates the level of sensitivity that a MLE approach would have to setting any hard constraints - in fact in this example the constraint determines the estimate in a trivial way.</p>
+<p>In the next section we introduce the soften the constraint by introducing a distribution over the range of possible values that <span class="math inline">\(s,\,p\)</span> can take, and demonstrate how this can be combined with the likelihood to derive estimates for the sock problem.</p>
 <p><br></p>
 <div id="next-part-2-bååths-prior" class="section level4">
 <h4><em>Next: <a href="2_baath_prior.html">Part 2: Bååth’s Prior</a></em></h4>
