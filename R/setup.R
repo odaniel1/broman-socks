@@ -10,6 +10,7 @@ library(wesanderson)
 
 library(knitr)
 library(kableExtra)
+library(formattable)
 
 ## ---- custom themes ---------------------------------------------------------
 

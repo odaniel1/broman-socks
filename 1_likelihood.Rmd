@@ -118,11 +118,11 @@ draws <- tibble(
 # summary table
 summarise_draws <- tribble(
   ~var, ~value,
-  "No. Draws", nrow(draws),
-  "No. All Distinct", sum(draws$all_distinct),
-  "Prob. All Distinct", sum(draws$all_distinct)/nrow(draws)
+  "No. Draws", nrow(draws) %>% digits(0, big.mark = ",") %>% as.character(),
+  "No. All Distinct", sum(draws$all_distinct) %>% digits(0, big.mark = ",") %>% as.character(),
+  "Prob. All Distinct", (sum(draws$all_distinct)/nrow(draws))  %>% digits(3) %>% as.character()
 ) %>%
-kable(digits = 2, col.names = c("Summary", "")) %>%
+kable( col.names = c("Summary", ""), align = "lr") %>%
 kable_styling(
   bootstrap_options = "condensed",
   full_width = FALSE,
@@ -216,7 +216,7 @@ In the next section we introduce a prior distribution over what we believe to be
 
 <br>
 
-#### *Next: [Part 2: Baath's Prior](2_baath_prior.html)*
+#### *Next: [Part 2: B&aring;&aring;th's Prior](2_baath_prior.html)*
 
 ```{r, echo = FALSE}
 knit_exit()
